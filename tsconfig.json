@@ -1,0 +1,23 @@
+{
+   "compilerOptions": {
+      "strict": true,
+
+      "declaration": true,
+      "declarationDir": "dist",
+      "outDir": "dist",
+      "rootDir": "src",
+      "allowJs": true,
+      "sourceMap": true,
+      "noImplicitAny": true,
+      "baseUrl": ".",
+      "paths": {},
+   },
+   "exclude": [
+      "node_modules",
+      "dist",
+      "test",
+      "examples",
+      "*.config.*"
+   ],
+   "extends": "@tsconfig/node10/tsconfig.json"
+}

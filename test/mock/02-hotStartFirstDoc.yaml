@@ -1,0 +1,46 @@
+name: Spec Example 2.4. Sequence of Mappings
+from: http://www.yaml.org/spec/1.2/spec.html#id2760193
+tags: sequence mapping spec
+yaml: |
+  -
+    name: Mark McGwire
+    hr:   65
+    avg:  0.278
+  -
+    name: Sammy Sosa
+    hr:   63
+    avg:  0.288
+DOCNBR: 1
+# Comment
+---
+yaml: |
+  "top1" :␣
+    "key1" : &alias1 scalar1
+  'top2' :␣
+    'key2' : &alias2 scalar2
+  top3: &node3␣
+    *alias1 : scalar3
+  top4:␣
+    *alias2 : scalar4
+  top5   :␣␣␣␣
+    scalar5
+  top6:␣
+    &anchor6 'key6' : scalar6
+DOCNBR: 2
+# Comment
+...
+
+# Comment
+
+%YAML 1.1
+---
+
+
+
+
+
+[1, 2, 3, 4, 3]
+---
+endMessage: '[{"name":"ob1","port_type" ... }]'
+DOCNBR: 4
+
