@@ -27,45 +27,53 @@ class YamlDocSplitter extends Transform {
       encoding: BufferEncoding,
       callback: TransformCallback
    ): void {
-      let prevMatchIndex = 0
-      let prevMatchLen = 0
+      let latestMatchIndex = 0
+      let latestMatchLen = 0
       let docsNbr = 0
       let pushError = false
 
       this.#yamlStream += this.#decoder.write(chunk)
+      const allMatchGen = this.#yamlStream.matchAll(startOrEndDoc)
 
-      for (const m of this.#yamlStream.matchAll(startOrEndDoc)) {
-         if (m.index !== undefined) {
-            const isExplicitEnd = m[1] === '...'
-            const ret = this.#tryDoc(
-               isExplicitEnd,
-               prevMatchIndex + prevMatchLen,
-               m.index || 0
-            )
-            if (!pushError && ret < 0) {
-               pushError = true
-            }
-            if (ret > 0) {
-               docsNbr += 1
-               if (isExplicitEnd) {
-                  this.#curDocStartPos = m.index + m[1].length + 1
-               } else {
-                  this.#curDocStartPos = m.index
-               }
-            }
-            prevMatchIndex = m.index
-            prevMatchLen = m[0].length
+      while (true) {
+         const g = allMatchGen.next()
+         if (g.done) {
+            break
          }
+         const m = g.value
+         if (!m || m.index === undefined) {
+            break
+         }
+         const isExplicitEnd = m[1] === '...'
+         const start = latestMatchIndex + latestMatchLen
+         const end = m.index
+         const ret = this.#tryDoc(isExplicitEnd, start, end)
+         if (ret < 0) {
+            pushError = true
+            break
+         }
+         if (ret > 0) {
+            docsNbr += 1
+            if (isExplicitEnd) {
+               this.#curDocStartPos = m.index + m[1].length + 1
+            } else {
+               this.#curDocStartPos = m.index
+            }
+         }
+         latestMatchIndex = m.index
+         latestMatchLen = m[0].length
       }
+
       // remove parsed docs string content
-      if (docsNbr > 0 && prevMatchIndex > 0) {
-         this.#yamlStream = this.#yamlStream.slice(prevMatchIndex + prevMatchLen)
+      if (docsNbr > 0 && latestMatchIndex > 0) {
+         this.#yamlStream = this.#yamlStream.slice(latestMatchIndex + latestMatchLen)
          this.#curDocStartPos = 0
       }
       if (!pushError) callback()
    }
 
    _flush(callback: TransformCallback): void {
+      this.#yamlStream += this.#decoder.end()
       if (this.#yamlStream.length > 0) {
          // EOF as explicit END of doc "..."
          this.push(this.#yamlStream)
@@ -75,8 +83,8 @@ class YamlDocSplitter extends Transform {
    }
 
    #tryDoc(explicitEnd: boolean, start: number, end: number): number {
-      // // eslint-disable-next-line prefer-rest-params
       // console.log('+++++++++++++++++++++++++++++++++++++++++++')
+      // eslint-disable-next-line prefer-rest-params
       // console.log('tryDoc', Array.from(arguments), this.#curDocStartPos)
       // console.log(this.#yamlStream.slice(this.#curDocStartPos, end))
       // console.log('===========================================')
