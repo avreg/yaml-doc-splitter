@@ -8,7 +8,7 @@ const startOrEndDoc = /\r?\n([-.]{3})\s*\r?\n/g
 
 class YamlDocSplitter extends Transform {
    #decoder = new StringDecoder('utf8')
-   #yamlStream = ''
+   #yamlString = ''
    #curDocStartPos = 0
 
    constructor(params?: TransformOptions) {
@@ -18,22 +18,13 @@ class YamlDocSplitter extends Transform {
    }
 
    #reset(): void {
-      this.#yamlStream = ''
+      this.#yamlString = ''
       this.#curDocStartPos = 0
    }
 
-   _transform(
-      chunk: Buffer,
-      encoding: BufferEncoding,
-      callback: TransformCallback
-   ): void {
-      let latestMatchIndex = 0
-      let latestMatchLen = 0
-      let docsNbr = 0
-      let pushError = false
-
-      this.#yamlStream += this.#decoder.write(chunk)
-      const allMatchGen = this.#yamlStream.matchAll(startOrEndDoc)
+   *#split(): Generator<string, boolean, unknown> {
+      let start = this.#curDocStartPos
+      const allMatchGen = this.#yamlString.matchAll(startOrEndDoc)
 
       while (true) {
          const g = allMatchGen.next()
@@ -44,66 +35,75 @@ class YamlDocSplitter extends Transform {
          if (!m || m.index === undefined) {
             break
          }
+
          const isExplicitEnd = m[1] === '...'
-         const start = latestMatchIndex + latestMatchLen
          const end = m.index
-         const ret = this.#tryDoc(isExplicitEnd, start, end)
-         if (ret < 0) {
-            pushError = true
-            break
-         }
-         if (ret > 0) {
-            docsNbr += 1
-            if (isExplicitEnd) {
-               this.#curDocStartPos = m.index + m[1].length + 1
-            } else {
-               this.#curDocStartPos = m.index
+
+         let docSlice = ''
+         if (!isExplicitEnd) {
+            docSlice = this.#yamlString.slice(start, end)
+            if (docSlice.includes('%YAML')) {
+               // FIXME: over ?
+               start = m.index + m[1].length + 1
+               continue
             }
          }
-         latestMatchIndex = m.index
-         latestMatchLen = m[0].length
+         if (!docSlice || this.#curDocStartPos !== start) {
+            docSlice = this.#yamlString.slice(this.#curDocStartPos, end)
+         }
+
+         yield docSlice
+
+         if (isExplicitEnd) {
+            // FIXME: over ?
+            start = m.index + m[1].length + 1
+         } else {
+            start = m.index
+         }
+         this.#curDocStartPos = start
+      }
+      return true
+   }
+
+   _transform(
+      chunk: Buffer,
+      encoding: BufferEncoding,
+      callback: TransformCallback
+   ): void {
+      let docsNbr = 0
+      let pushError = false
+
+      this.#yamlString += this.#decoder.write(chunk)
+
+      const allDocGen = this.#split()
+
+      for (const yamlDocString of allDocGen) {
+         if (this.push(yamlDocString)) {
+            docsNbr += 1
+         } else {
+            pushError = true
+            allDocGen.return(false)
+         }
       }
 
       // remove parsed docs string content
-      if (docsNbr > 0 && latestMatchIndex > 0) {
-         this.#yamlStream = this.#yamlStream.slice(latestMatchIndex + latestMatchLen)
+      if (docsNbr > 0 && this.#curDocStartPos > 0) {
+         this.#yamlString = this.#yamlString.slice(this.#curDocStartPos)
          this.#curDocStartPos = 0
       }
+
       if (!pushError) callback()
    }
 
    _flush(callback: TransformCallback): void {
-      this.#yamlStream += this.#decoder.end()
-      if (this.#yamlStream.length > 0) {
+      this.#yamlString += this.#decoder.end()
+      if (this.#yamlString.length > 0) {
          // EOF as explicit END of doc "..."
-         this.push(this.#yamlStream)
-         this.#reset()
-      }
-      callback()
-   }
-
-   #tryDoc(explicitEnd: boolean, start: number, end: number): number {
-      // console.log('+++++++++++++++++++++++++++++++++++++++++++')
-      // eslint-disable-next-line prefer-rest-params
-      // console.log('tryDoc', Array.from(arguments), this.#curDocStartPos)
-      // console.log(this.#yamlStream.slice(this.#curDocStartPos, end))
-      // console.log('===========================================')
-      if (explicitEnd) {
-         // ...
-         return this.#pushDoc(end)
-      } else {
-         // ---
-         const doc = this.#yamlStream.slice(start, end)
-         if (!doc.includes('%YAML')) {
-            return this.#pushDoc(end)
+         if (this.push(this.#yamlString)) {
+            this.#reset()
          }
       }
-      return 0
-   }
-
-   #pushDoc(end: number) {
-      const pushRet = this.push(this.#yamlStream.slice(this.#curDocStartPos, end))
-      return pushRet ? 1 : -1
+      callback()
    }
 }
 
