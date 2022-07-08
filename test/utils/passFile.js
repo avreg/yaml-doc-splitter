@@ -8,7 +8,7 @@ const YamlChecker = require('./YamlChecker')
 const pipeline = util.promisify(stream.pipeline)
 
 async function passFile(mockFilePath, srcHighWaterMark, sinkHighWaterMark) {
-   console.log(mockFilePath, srcHighWaterMark, sinkHighWaterMark)
+   // console.log(mockFilePath, srcHighWaterMark, sinkHighWaterMark)
    const input = createReadStream(mockFilePath, {
       highWaterMark: srcHighWaterMark
    })

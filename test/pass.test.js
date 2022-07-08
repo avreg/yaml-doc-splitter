@@ -12,7 +12,9 @@ const passFile = require('../test/utils/passFile')
 const MOCK_ROOT_DIR = 'test/mock'
 
 const mockFiles = getFilesSync(MOCK_ROOT_DIR, /\.ya?ml$/i)
-const highWaterMarks = [8, 16, 32, 64, 128, 256, 512, 2048, 4096, 16535, undefined]
+// const highWaterMarks = [8, 16, 32, 64, 128, 256, 512, 2048, 4096, 16535, undefined]
+const highWaterMarks = [...Array(300).keys()]
+highWaterMarks[0] = undefined
 
 describe.each(['src', 'sink'])('%s shaper', (dir) => {
    describe.each(highWaterMarks)('highWatermark=%i', (highWatermark) => {
