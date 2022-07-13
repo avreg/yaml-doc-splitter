@@ -4,7 +4,7 @@
    "description": "to use console.* as a logger",
    "private": true,
    "engines": {
-      "node": ">=10.24.0"
+      "node": "^10.17.0"
    },
    "files": [
       "src/index.ts"
