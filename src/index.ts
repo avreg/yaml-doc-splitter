@@ -35,13 +35,14 @@ class YamlDocSplitter extends Transform {
 
          const isExplicitEnd = m[1] === '...'
          const end = m.index
+         const newDocBodyStart = m.index + m[0].length
 
          let docSlice = ''
          if (!isExplicitEnd) {
             docSlice = this.#yamlString.slice(start, end)
             if (docSlice.includes('%YAML')) {
-               // FIXME: over ?
-               start = m.index + m[1].length + 1
+               // do not change this.#curDocStartPos
+               start = newDocBodyStart
                continue
             }
          }
@@ -51,13 +52,7 @@ class YamlDocSplitter extends Transform {
 
          yield docSlice
 
-         if (isExplicitEnd) {
-            // FIXME: over ?
-            start = m.index + m[1].length + 1
-         } else {
-            start = m.index
-         }
-         this.#curDocStartPos = start
+         this.#curDocStartPos = start = newDocBodyStart
       }
       return true
    }
