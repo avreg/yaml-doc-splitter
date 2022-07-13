@@ -1,7 +1,7 @@
 import { Transform, TransformCallback, TransformOptions } from 'stream'
 import { StringDecoder } from 'string_decoder'
 
-const startOrEndDoc = /\r?\n([-.]{3})\s*\r?\n/g
+const startOrEndDoc = /\r?\n([-.]{3})[ \t]*\r?\n/g
 
 class YamlDocSplitter extends Transform {
    #decoder = new StringDecoder('utf8')
