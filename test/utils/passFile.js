@@ -3,7 +3,7 @@ const { createReadStream } = require('fs')
 const util = require('util')
 const stream = require('stream')
 const { YamlDocSplitter } = require('../../dist/yaml-doc-splitter.js')
-const YamlChecker = require('./YamlChecker')
+const { YamlChecker } = require('./YamlChecker')
 
 const pipeline = util.promisify(stream.pipeline)
 
