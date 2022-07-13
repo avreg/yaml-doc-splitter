@@ -12,10 +12,14 @@ class ValidationError extends Error {
 }
 
 class YamlChecker extends Writable {
-   #docNbr = 0
+   constructor(options) {
+      super(options)
+
+      this.docNbr = 0
+   }
 
    _write(chunk, encoding, callback) {
-      this.#docNbr += 1
+      this.docNbr += 1
       const yamlStr = chunk.toString()
 
       try {
@@ -23,21 +27,21 @@ class YamlChecker extends Writable {
          if (jsonObj !== null && jsonObj !== undefined) {
             // console.dir(jsonObj)
             if (Array.isArray(jsonObj)) {
-               if (jsonObj[jsonObj.length - 1] !== this.#docNbr) {
+               if (jsonObj[jsonObj.length - 1] !== this.docNbr) {
                   this.emit(
                      'error',
                      new ValidationError(
-                        `doc #${this.#docNbr} array sequence error`,
+                        `doc #${this.docNbr} array sequence error`,
                         jsonObj
                      )
                   )
                }
             } else if (typeof jsonObj === 'object') {
-               if (jsonObj.DOCNBR !== this.#docNbr) {
+               if (jsonObj.DOCNBR !== this.docNbr) {
                   this.emit(
                      'error',
                      new ValidationError(
-                        `doc #${this.#docNbr} obj sequence error`,
+                        `doc #${this.docNbr} obj sequence error`,
                         jsonObj
                      )
                   )
@@ -46,7 +50,7 @@ class YamlChecker extends Writable {
                this.emit(
                   'error',
                   new ValidationError(
-                     `unexpected type "${typeof jsonObj}" in doc #${this.#docNbr}`,
+                     `unexpected type "${typeof jsonObj}" in doc #${this.docNbr}`,
                      jsonObj
                   )
                )
