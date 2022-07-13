@@ -4,11 +4,6 @@ const path = require('path')
 const getFilesSync = require('./utils/getFilesSync.js')
 const passFile = require('../test/utils/passFile')
 
-//
-//    const f = await getAllMockFiles('test/mock')
-//    console.log(f)
-// })()
-
 const MOCK_ROOT_DIR = 'test/mock'
 
 const mockFiles = getFilesSync(MOCK_ROOT_DIR, /\.ya?ml$/i)

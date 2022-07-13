@@ -1,6 +1,3 @@
-/* eslint-disable prefer-rest-params */
-// https://habr.com/ru/post/353886/
-
 import { Transform, TransformCallback, TransformOptions } from 'stream'
 import { StringDecoder } from 'string_decoder'
 
