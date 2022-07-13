@@ -19,11 +19,13 @@ yaml: |
 DOCNBR: 1
 # Comment
 ---
-
+# doc 2
 
 ---
+# doc 3
 ...
 ---
+# doc 4
 ...
 
 ---
