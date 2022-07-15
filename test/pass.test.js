@@ -2,7 +2,7 @@
 // https://stackoverflow.com/questions/5827612/node-js-fs-readdir-recursive-directory-search
 const path = require('path')
 const getFilesSync = require('./utils/getFilesSync.js')
-const passFile = require('../test/utils/passFile')
+const passFile = require('./utils/passFile')
 
 const MOCK_ROOT_DIR = 'test/mock'
 

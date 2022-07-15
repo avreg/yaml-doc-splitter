@@ -1,3 +1,3 @@
-const { YamlDocSplitter } = require('../dist/yaml-doc-splitter.js')
+const { YamlDocSplitter } = require('../dist/yaml-doc-splitter')
 
 const yds = new YamlDocSplitter()
