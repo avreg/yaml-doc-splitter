@@ -9,7 +9,12 @@ class YamlDocSplitter extends Transform {
    #curDocStartPos = 0
 
    constructor(params?: TransformOptions) {
-      super(params)
+      const _params = Object.assign({}, params ?? {}, {
+         readableObjectMode: false,
+         writableObjectMode: true
+      })
+
+      super(_params)
 
       this.#reset()
    }
@@ -59,7 +64,7 @@ class YamlDocSplitter extends Transform {
 
    _transform(
       chunk: Buffer,
-      encoding: BufferEncoding,
+      _encoding: BufferEncoding,
       callback: TransformCallback
    ): void {
       let docsNbr = 0
