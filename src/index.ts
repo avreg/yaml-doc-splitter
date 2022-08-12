@@ -24,7 +24,7 @@ class YamlDocSplitter extends Transform {
       this.#curDocStartPos = 0
    }
 
-   *#split(): Generator<string, boolean, unknown> {
+   *#splitYamlGen(): Generator<string, boolean, unknown> {
       let start = this.#curDocStartPos
       const allMatchGen = this.#yamlString.matchAll(startOrEndDoc)
 
@@ -72,7 +72,7 @@ class YamlDocSplitter extends Transform {
 
       this.#yamlString += this.#decoder.write(chunk)
 
-      const allDocGen = this.#split()
+      const allDocGen = this.#splitYamlGen()
 
       for (const yamlDocString of allDocGen) {
          if (this.push(yamlDocString)) {
