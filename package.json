@@ -4,7 +4,7 @@
    "description": "A Node.js transform stream to split multi-doc YAML stream",
    "private": true,
    "engines": {
-      "node": "^10.17.0"
+      "node": "^12"
    },
    "files": [
       "src/index.ts"
