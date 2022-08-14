@@ -13,7 +13,7 @@ class YamlDocSplitter extends Transform {
    constructor(params?: TransformOptions) {
       const _params = Object.assign({}, params ?? {}, {
          readableObjectMode: false,
-         writableObjectMode: true
+         writableObjectMode: false
       })
 
       super(_params)
