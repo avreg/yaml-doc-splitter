@@ -4,15 +4,15 @@
    "description": "A Node.js transform stream to split multi-doc YAML stream",
    "private": true,
    "engines": {
-      "node": "^12"
+      "node": ">= 12"
    },
+   "main": "dist/yaml-doc-splitter.js",
+   "type": "commonjs",
+   "types": "dist/index.d.ts",
    "files": [
       "dist/index.d.ts",
       "dist/yaml-doc-splitter.js.map"
    ],
-   "main": "dist/yaml-doc-splitter.js",
-   "type": "commonjs",
-   "types": "dist/index.d.ts",
    "scripts": {
       "prepare": "husky install",
       "lint": "eslint src test",
