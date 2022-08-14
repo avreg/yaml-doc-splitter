@@ -7,7 +7,8 @@
       "node": "^12"
    },
    "files": [
-      "src/index.ts"
+      "dist/index.d.ts",
+      "dist/yaml-doc-splitter.js.map"
    ],
    "main": "dist/yaml-doc-splitter.js",
    "type": "commonjs",
