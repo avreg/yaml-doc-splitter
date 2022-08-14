@@ -9,7 +9,7 @@ module.exports = (env, argv) => {
       target: 'node',
 
       mode: isProductionBuild ? 'production' : 'development',
-      devtool: isProductionBuild ? 'source-map' : 'eval',
+      devtool: isProductionBuild ? 'source-map' : 'eval-source-map',
 
       entry: './src/index.ts', // webpack entry point. Module to start building dependency graph
 
