@@ -16,6 +16,14 @@ trim_trailing_whitespace = false
 indent_style             = tab
 indent_size              = 3
 
+<<<<<<< HEAD
 [*.{yml,yaml}]
+=======
+[*.yml]
+indent_style             = space
+indent_size              = 2
+
+[*.yaml]
+>>>>>>> 6897f4c7755a97749a95b5a3b0611d44ad2c84da
 indent_style             = space
 indent_size              = 2
