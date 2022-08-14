@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const TerserPlugin = require('terser-webpack-plugin')
+const ESLintPlugin = require('eslint-webpack-plugin')
 const path = require('path')
 
 module.exports = (env, argv) => {
@@ -42,6 +43,7 @@ module.exports = (env, argv) => {
             { test: /\.[mc]?js$/, loader: 'source-map-loader' }
          ]
       },
+      plugins: [new ESLintPlugin({ extensions: ['ts'] })],
       optimization: {
          minimize: isProductionBuild,
          minimizer: [new TerserPlugin()]
