@@ -1,9 +1,7 @@
-import { Transform, TransformOptions } from 'stream'
+import { Transform, TransformCallback, TransformOptions } from 'stream'
 import { StringDecoder } from 'string_decoder'
 
 const startOrEndDoc = /\r?\n([-.]{3})[ \t]*\r?\n/g
-
-type ydsTransformCallback = (error?: Error | null, data?: string) => void
 
 class YamlDocSplitter extends Transform {
    #decoder = new StringDecoder('utf8')
@@ -67,7 +65,7 @@ class YamlDocSplitter extends Transform {
    _transform(
       chunk: Buffer,
       _encoding: BufferEncoding,
-      callback: ydsTransformCallback
+      callback: TransformCallback
    ): void {
       let docsNbr = 0
       let pushError = false
@@ -94,7 +92,7 @@ class YamlDocSplitter extends Transform {
       if (!pushError) callback()
    }
 
-   _flush(callback: ydsTransformCallback): void {
+   _flush(callback: TransformCallback): void {
       this.#yamlString += this.#decoder.end()
       if (this.#yamlString.length > 0) {
          // EOF as explicit END of doc "..."
