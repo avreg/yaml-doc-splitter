@@ -10,16 +10,17 @@ import util from 'node:util'
 import stream from 'node:stream'
 import os from 'node:os'
 import process from 'node:process'
-import { YamlDocSplitter } from '../dist/yaml-doc-splitter.js'
+import ydsPkg from '../dist/yaml-doc-splitter.js'
 import yaml from 'js-yaml'
+
+const { YamlDocSplitter } = ydsPkg
 
 const pipeline = util.promisify(stream.pipeline)
 
 class YamlToJson extends stream.Transform {
    constructor() {
       super({
-         readableObjectMode: true,
-         writableObjectMode: false
+         readableObjectMode: true
       })
    }
 
@@ -41,7 +42,6 @@ class YamlToJson extends stream.Transform {
 class JsonStringifier extends stream.Transform {
    constructor() {
       super({
-         readableObjectMode: false,
          writableObjectMode: true
       })
    }

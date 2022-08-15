@@ -56,15 +56,11 @@ yarn add @avreg/yaml-doc-splitter
 
 const fs = require('fs')
 const stream = require('stream')
-const process = require('process')
 const { YamlDocSplitter } = require('@avreg/yaml-doc-splitter')
 
 class DocDumper extends stream.Writable {
    constructor() {
-      super({
-         readableObjectMode: false,
-         writableObjectMode: true
-      })
+      super()
 
       this._docNbr = 0
    }
@@ -75,14 +71,14 @@ class DocDumper extends stream.Writable {
       this._docNbr += 1
 
       console.log()
-      console.log(`@@@@@@@ Yaml doc #${this._docNbr} @@@@@@@`)
+      console.log(`@@@@@@@ YAML doc #${this._docNbr} @@@@@@@`)
       console.log(yamlDocString)
 
       callback()
    }
 
    _final(callback) {
-      console.log(`Total Yaml docs count: ${this._docNbr}`)
+      console.log(`Total YAML docs count: ${this._docNbr}`)
 
       callback()
    }
@@ -112,24 +108,24 @@ import util from 'node:util'
 import stream from 'node:stream'
 import os from 'node:os'
 import process from 'node:process'
+import ydsPkg from '../dist/yaml-doc-splitter.js'
 import yaml from 'js-yaml'
-import { YamlDocSplitter } from '@avreg/yaml-doc-splitter'
+
+const { YamlDocSplitter } = ydsPkg
 
 const pipeline = util.promisify(stream.pipeline)
 
 class YamlToJson extends stream.Transform {
    constructor() {
       super({
-         readableObjectMode: true,
-         writableObjectMode: false
+         readableObjectMode: true
       })
    }
 
    _transform(stringChunk, _encoding, callback) {
       try {
          const jsonObj = yaml.load(stringChunk)
-         if (jsonObj !== null &&
-             jsonObj !== undefined) {
+         if (jsonObj !== null && jsonObj !== undefined) {
             callback(null, jsonObj)
          } else {
             // empty object
@@ -144,16 +140,13 @@ class YamlToJson extends stream.Transform {
 class JsonStringifier extends stream.Transform {
    constructor() {
       super({
-         readableObjectMode: false,
          writableObjectMode: true
       })
    }
 
    _transform(jsonObj, _encoding, callback) {
       try {
-         callback(
-            null,
-            JSON.stringify(jsonObj, null, 3) + os.EOL)
+         callback(null, JSON.stringify(jsonObj, null, 3) + os.EOL)
       } catch (err) {
          callback(err)
       }

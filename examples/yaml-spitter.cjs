@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /***
  * Usage:
  *  $ node path/to/yaml-splitter.cjs multi-doc.yaml
@@ -7,15 +8,11 @@
 
 const fs = require('fs')
 const stream = require('stream')
-const process = require('process')
 const { YamlDocSplitter } = require('../dist/yaml-doc-splitter.js')
 
 class DocDumper extends stream.Writable {
    constructor() {
-      super({
-         readableObjectMode: false,
-         writableObjectMode: true
-      })
+      super()
 
       this._docNbr = 0
    }
