@@ -18,7 +18,7 @@ class YamlChecker extends Writable {
       this.docNbr = 0
    }
 
-   _write(chunk, encoding, callback) {
+   _write(chunk, _encoding, callback) {
       this.docNbr += 1
       const yamlStr = chunk.toString()
 
