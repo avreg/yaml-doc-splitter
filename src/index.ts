@@ -1,65 +1,65 @@
-import { Transform, TransformCallback, TransformOptions } from 'stream'
-import { StringDecoder } from 'string_decoder'
+import { Transform, TransformCallback, TransformOptions } from 'stream';
+import { StringDecoder } from 'string_decoder';
 
-const startOrEndDoc = /\r?\n([-.]{3})[ \t]*\r?\n/g
+const startOrEndDoc = /\r?\n([-.]{3})[ \t]*\r?\n/g;
 
 class YamlDocSplitter extends Transform {
-   #decoder = new StringDecoder('utf8')
-   #yamlString = ''
-   #curDocStartPos = 0
+   #decoder = new StringDecoder('utf8');
+   #yamlString = '';
+   #curDocStartPos = 0;
 
    constructor(params?: TransformOptions) {
       const _params = Object.assign({}, params ?? {}, {
          readableObjectMode: false,
          writableObjectMode: false
-      })
+      });
 
-      super(_params)
+      super(_params);
 
-      this.#reset()
+      this.#reset();
    }
 
    #reset(): void {
-      this.#yamlString = ''
-      this.#curDocStartPos = 0
+      this.#yamlString = '';
+      this.#curDocStartPos = 0;
    }
 
    *#splitYamlGen(): Generator<string, boolean, unknown> {
-      let start = this.#curDocStartPos
-      const allMatchGen = this.#yamlString.matchAll(startOrEndDoc)
+      let start = this.#curDocStartPos;
+      const allMatchGen = this.#yamlString.matchAll(startOrEndDoc);
 
       while (true) {
-         const g = allMatchGen.next()
+         const g = allMatchGen.next();
          if (g.done) {
-            break
+            break;
          }
-         const m = g.value
+         const m = g.value;
          if (!m || m.index === undefined) {
-            break
+            break;
          }
 
-         const isExplicitEnd = m[1] === '...'
-         const end = m.index
-         const newDocBodyStart = m.index + m[0].length
+         const isExplicitEnd = m[1] === '...';
+         const end = m.index;
+         const newDocBodyStart = m.index + m[0].length;
 
-         let docSlice = ''
+         let docSlice = '';
          if (!isExplicitEnd) {
-            docSlice = this.#yamlString.slice(start, end)
+            docSlice = this.#yamlString.slice(start, end);
             if (docSlice.includes('%YAML')) {
                // do not change this.#curDocStartPos
-               start = newDocBodyStart
-               continue
+               start = newDocBodyStart;
+               continue;
             }
          }
          if (!docSlice || this.#curDocStartPos !== start) {
-            docSlice = this.#yamlString.slice(this.#curDocStartPos, end)
+            docSlice = this.#yamlString.slice(this.#curDocStartPos, end);
          }
 
-         yield docSlice
+         yield docSlice;
 
-         this.#curDocStartPos = start = newDocBodyStart
+         this.#curDocStartPos = start = newDocBodyStart;
       }
-      return true
+      return true;
    }
 
    _transform(
@@ -67,41 +67,41 @@ class YamlDocSplitter extends Transform {
       _encoding: BufferEncoding,
       callback: TransformCallback
    ): void {
-      let docsNbr = 0
-      let pushError = false
+      let docsNbr = 0;
+      let pushError = false;
 
-      this.#yamlString += this.#decoder.write(chunk)
+      this.#yamlString += this.#decoder.write(chunk);
 
-      const allDocGen = this.#splitYamlGen()
+      const allDocGen = this.#splitYamlGen();
 
       for (const yamlDocString of allDocGen) {
          if (this.push(yamlDocString)) {
-            docsNbr += 1
+            docsNbr += 1;
          } else {
-            pushError = true
-            allDocGen.return(false)
+            pushError = true;
+            allDocGen.return(false);
          }
       }
 
       // remove parsed docs string content
       if (docsNbr > 0 && this.#curDocStartPos > 0) {
-         this.#yamlString = this.#yamlString.slice(this.#curDocStartPos)
-         this.#curDocStartPos = 0
+         this.#yamlString = this.#yamlString.slice(this.#curDocStartPos);
+         this.#curDocStartPos = 0;
       }
 
-      if (!pushError) callback()
+      if (!pushError) callback();
    }
 
    _flush(callback: TransformCallback): void {
-      this.#yamlString += this.#decoder.end()
+      this.#yamlString += this.#decoder.end();
       if (this.#yamlString.length > 0) {
          // EOF as explicit END of doc "..."
          if (this.push(this.#yamlString)) {
-            this.#reset()
+            this.#reset();
          }
       }
-      callback()
+      callback();
    }
 }
 
-export { YamlDocSplitter }
+export { YamlDocSplitter };

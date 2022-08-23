@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const { YamlDocSplitter } = require('../dist/yaml-doc-splitter')
+const { YamlDocSplitter } = require('../dist/yaml-doc-splitter');
 
-const yds = new YamlDocSplitter()
+const yds = new YamlDocSplitter();
 
-console.dir(yds)
+console.dir(yds);

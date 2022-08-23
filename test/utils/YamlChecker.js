@@ -1,29 +1,29 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-const { Writable } = require('stream')
-const yaml = require('js-yaml')
+const { Writable } = require('stream');
+const yaml = require('js-yaml');
 
 class ValidationError extends Error {
    constructor(message, payload) {
-      super(message)
-      this.name = 'ValidationError'
-      this.payload = payload
+      super(message);
+      this.name = 'ValidationError';
+      this.payload = payload;
    }
 }
 
 class YamlChecker extends Writable {
    constructor(options) {
-      super(options)
+      super(options);
 
-      this.docNbr = 0
+      this.docNbr = 0;
    }
 
    _write(chunk, _encoding, callback) {
-      this.docNbr += 1
-      const yamlStr = chunk.toString()
+      this.docNbr += 1;
+      const yamlStr = chunk.toString();
 
       try {
-         const jsonObj = yaml.load(yamlStr)
+         const jsonObj = yaml.load(yamlStr);
          if (jsonObj !== null && jsonObj !== undefined) {
             // console.dir(jsonObj)
             if (Array.isArray(jsonObj)) {
@@ -34,7 +34,7 @@ class YamlChecker extends Writable {
                         `doc #${this.docNbr} array sequence error`,
                         jsonObj
                      )
-                  )
+                  );
                }
             } else if (typeof jsonObj === 'object') {
                if (jsonObj.DOCNBR !== this.docNbr) {
@@ -44,26 +44,28 @@ class YamlChecker extends Writable {
                         `doc #${this.docNbr} obj sequence error`,
                         jsonObj
                      )
-                  )
+                  );
                }
             } else {
                this.emit(
                   'error',
                   new ValidationError(
-                     `unexpected type "${typeof jsonObj}" in doc #${this.docNbr}`,
+                     `unexpected type "${typeof jsonObj}" in doc #${
+                        this.docNbr
+                     }`,
                      jsonObj
                   )
-               )
+               );
             }
          }
       } catch (e) {
-         this.emit('error', e)
+         this.emit('error', e);
       }
-      callback()
+      callback();
    }
 }
 
 module.exports = {
    ValidationError,
    YamlChecker
-}
+};

@@ -1,7 +1,7 @@
-import pkg from '../dist/yaml-doc-splitter.js'
+import pkg from '../dist/yaml-doc-splitter.js';
 
-const { YamlDocSplitter } = pkg
+const { YamlDocSplitter } = pkg;
 
-const yamlDocSplitter = new YamlDocSplitter()
+const yamlDocSplitter = new YamlDocSplitter();
 
-console.dir(yamlDocSplitter)
+console.dir(yamlDocSplitter);

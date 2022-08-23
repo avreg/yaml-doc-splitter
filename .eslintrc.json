@@ -23,7 +23,7 @@
       "prettier"
    ],
    "rules": {
-      "semi": ["error", "never"],
+      "semi": ["error", "always"],
       "curly": ["error"],
       "brace-style": ["error", "1tbs", { "allowSingleLine": false }],
       "no-process-exit": "off",
