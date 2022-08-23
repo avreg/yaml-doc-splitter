@@ -15,7 +15,7 @@
    ],
    "scripts": {
       "prepare": "husky install",
-      "lint": "eslint src test",
+      "lint": "eslint src test examples",
       "clean": "rimraf ./dist",
       "build": "yarn clean && webpack --mode production -c webpack.config.cjs",
       "build:dev": "yarn clean && webpack --mode development -c webpack.config.cjs",
